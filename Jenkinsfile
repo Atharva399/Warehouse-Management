@@ -19,7 +19,13 @@ python backend/test_api.py'''
             }
         }
         stage('Frontend build') {
-            steps { dir('frontend') { sh 'npm ci && npm run build' } }
+            steps {
+                // Use a pinned Node.js container so the Jenkins host does not need Node/npm installed.
+                sh '''docker run --rm \
+  -v "$WORKSPACE/frontend:/app" \
+  -w /app \
+  node:22-alpine sh -lc 'node --version && npm --version && npm ci && npm run build' '''
+            }
         }
         stage('Build Docker images') {
             steps {
