@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wms-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wms-backend
+  template:
+    metadata:
+      labels:
+        app: wms-backend
+    spec:
+      containers:
+        - name: backend
+          image: atharvapangare/warehouse-backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+          readinessProbe:
+            httpGet:
+              path: /api/products
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/products
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests: { cpu: "100m", memory: "128Mi" }
+            limits: { cpu: "500m", memory: "256Mi" }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wms-backend
+spec:
+  selector:
+    app: wms-backend
+  ports:
+    - port: 5000
+      targetPort: 5000
+  type: ClusterIP

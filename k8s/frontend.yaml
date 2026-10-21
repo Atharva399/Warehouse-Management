@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wms-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wms-frontend
+  template:
+    metadata:
+      labels:
+        app: wms-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: atharvapangare/warehouse-frontend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests: { cpu: "100m", memory: "64Mi" }
+            limits: { cpu: "300m", memory: "128Mi" }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wms-frontend
+spec:
+  selector:
+    app: wms-frontend
+  ports:
+    - port: 80
+      targetPort: 80
+  type: NodePort
