@@ -31,3 +31,8 @@ kubectl rollout status deployment/wms-backend
 
 ## Project behavior note
 The existing React UI currently uses its own client-side mock data and login. The Flask API has separate mock-data endpoints and is not currently wired into the React UI. This deployment runs both components, but it does not automatically convert the UI to database-backed API data. The demo login is hardcoded in the original frontend; do not use it as real production authentication.
+
+
+## Backend test fixes
+
+The backend now issues a demo bearer token at login, protects API data routes, returns JSON 404 responses for unknown API paths, and handles missing login JSON cleanly. Kubernetes health probes use `/health`, which does not require a login token. The in-memory token mechanism is intended for this coursework demo, not production authentication.
